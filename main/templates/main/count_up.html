@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %} Count up {% endblock %}
+{% block content %}
+<form method="GET" action="#">
+    <div class="form-group">
+        {{ form.as_p }}
+    </div>
+    <button type="submit" class="btn btn-primary">Рассчитать</button>
+</form>
+
+{% endblock %}
