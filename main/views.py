@@ -41,7 +41,7 @@ def new_value(request):
             if table is not None:
                 data_table = table
             else:
-                data_table = Data.save(x_data_type, y_data_type)
+                data_table = Data(x_data_type, y_data_type).save()
             first_parameter = [float(item) for item in x_value]
             second_parameter = [float(item) for item in y_value]
 
@@ -51,7 +51,7 @@ def new_value(request):
                     First_parameter(x_value=first_item, date_for_the_first=date).save()
                     Second_parameter(y_value=second_item, date_for_the_second=date).save()
 
-                    n=data_table.first_parameter = First_parameter.pk
+                    data_table.first_parameter = First_parameter.pk
                     data_table.second_parameter = Second_parameter.pk
 
                 cor, p_value = pearsonr(first_parameter, second_parameter)

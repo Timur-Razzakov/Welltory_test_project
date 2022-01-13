@@ -25,12 +25,12 @@ class Data(models.Model):
     user_id = models.ForeignKey(MyUser, verbose_name='Пользователь', on_delete=models.CASCADE)
     x_data_type = models.CharField(max_length=50, verbose_name='Вид данных_x')
     y_data_type = models.CharField(max_length=50, verbose_name='Вид данных_y')
-    x_value = models.ForeignKey(First_parameter, on_delete=models.CASCADE, verbose_name='Значение для x')
-    y_value = models.ForeignKey(Second_parameter, on_delete=models.CASCADE, verbose_name='Значение для y')
+    x_value = models.ManyToManyField(First_parameter, verbose_name='Значения для x')
+    y_value = models.ManyToManyField(Second_parameter, verbose_name='Значения для y')
     created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
 
     def __str__(self):
-        return self.user_id
+        return str('{}:{}'.format(self.x_value, self.y_value))
 
 
 """   {

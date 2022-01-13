@@ -32,7 +32,7 @@ class Second_parameterAdmin(admin.ModelAdmin):
 
 
 class DataAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'x_data_type', 'y_data_type', 'y_value', 'x_value', 'created_at')
+    list_display = ('user_id', 'x_data_type', 'y_data_type',  'created_at')
 
 
 admin.site.register(Correlation, CorrelationAdmin)
