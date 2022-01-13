@@ -27,20 +27,7 @@ class Parameters_Form(forms.Form):
 
 
 class AddDataForm(forms.Form):
-    # first_parameter = forms.CharField(
-    #     queryset=First_parameter.objects.filter('x_value'),
-    #     widget=forms.Select(attrs={'class': 'form-control'}),
-    #     label='Первое значение'
-    # )
-    # second_parameter = forms.CharField(
-    #     queryset=Second_parameter.objects.filter('y_value'),
-    #     widget=forms.Select(attrs={'class': 'form-control'}),
-    #     label='Второе значение'
-    # )
-    #
-    # class Meta:
-    #     model = Data
-    #     fields = ['x_data_type', 'y_data_type', 'x_value', ]
+
     x_data_type = forms.CharField(
         required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
         label='Вид первого значения'

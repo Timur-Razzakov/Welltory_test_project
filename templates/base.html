@@ -14,6 +14,7 @@
 
 <div class="d-flex" id="wrapper">
     <!-- Sidebar-->
+    {% if user.is_authenticated %}
     <div class="border-end bg-white" id="sidebar-wrapper">
         <div class="sidebar-heading border-bottom bg-light">TR :)</div>
         <div class="list-group list-group-flush">
@@ -28,16 +29,20 @@
                href="#!">Вывести результат</a>
         </div>
     </div>
+    {% endif %}
     <!-- Page content wrapper-->
     <div id="page-content-wrapper">
         <!-- Top navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+
             <div class="container-fluid">
+                {% if user.is_authenticated %}
                 <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
                 </button>
+                {% endif %}
                 <div class="collapse navbar-collapse d-flex flex-row-reverse" id="navbarNavDropdown">
                     <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                         <li class="nav-item "><a class="nav-link" href="{% url 'home' %}">Home</a></li>
