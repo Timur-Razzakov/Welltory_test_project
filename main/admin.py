@@ -22,7 +22,6 @@ class CorrelationAdmin(admin.ModelAdmin):
     # search_fields = ('user_id')  # поиск по айди и по дате
 
 
-
 class First_parameterAdmin(admin.ModelAdmin):
     list_display = ('x_value', 'date_for_the_first', 'created_at')
 
@@ -32,7 +31,7 @@ class Second_parameterAdmin(admin.ModelAdmin):
 
 
 class DataAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'x_data_type', 'y_data_type',  'created_at')
+    list_display = ('user_id', 'x_data_type', 'y_data_type', 'created_at')
 
 
 admin.site.register(Correlation, CorrelationAdmin)

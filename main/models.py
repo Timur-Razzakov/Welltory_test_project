@@ -30,7 +30,7 @@ class Data(models.Model):
     created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
 
     def __str__(self):
-        return str('{}:{}'.format(self.x_value, self.y_value))
+        return str(self.user_id)
 
 
 """   {

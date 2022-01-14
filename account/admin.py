@@ -8,16 +8,16 @@ from .models import MyUser
 
 
 class UserCreationForm(forms.ModelForm):
-    """форма для заполнения пароля и создание пользователя"""
+    """Форма для заполнения пароля и создание пользователя"""
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
     class Meta:
         model = MyUser
-        fields = ('email',)
+        fields = ('id','email',)
 
     def clean_password2(self):
-        """проверяет пароли на совпадение между собой"""
+        """Проверяет пароли на совпадение между собой"""
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
@@ -25,7 +25,7 @@ class UserCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        """ производим сохранение пользователя """
+        """ Производим сохранение пользователя """
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
@@ -42,7 +42,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'password', 'is_active', 'is_admin')
+        fields = ('id', 'email', 'password', 'is_active', 'is_admin')
 
     def clean_password(self):
         # Независимо от того, что предоставил пользователь, вернуть начальное значение.
@@ -56,21 +56,21 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('email', 'is_admin', )
+    list_display = ('id', 'email', 'is_admin',)
     list_filter = ('is_admin',)
     fieldsets = (
         # Поля для Отображения в админке
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('id', 'email', 'password')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     """ Поля которые будут использоваться при создании пользователя """
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
+            'fields': ('id', 'email', 'password1', 'password2'),
         }),
     )
-    search_fields = ('email',)
+    search_fields = ('id', 'email',)
     ordering = ('email',)
     filter_horizontal = ()
 

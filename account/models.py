@@ -61,7 +61,7 @@ class MyUser(AbstractBaseUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.email
+        return str(self.pk)
 
     def has_perm(self, perm, obj=None):
         """Проверяет есть ли у пользователя указанное разрешение """

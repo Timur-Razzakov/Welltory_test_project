@@ -19,14 +19,14 @@
         <div class="sidebar-heading border-bottom bg-light">TR :)</div>
         <div class="list-group list-group-flush">
             <a class="list-group-item list-group-item-action list-group-item-light p-3"
-               href="#!">Показать данные</a>
+               href="{% url 'show_data' %}">Показать данные</a>
             <a class="list-group-item list-group-item-action list-group-item-light p-3"
                href="{% url 'count_up' %}">Подсчитать</a>
             <a class="list-group-item list-group-item-action list-group-item-light p-3"
                href="{% url 'show_form' %}">Заполнить новыми
                 данными</a>
             <a class="list-group-item list-group-item-action list-group-item-light p-3"
-               href="#!">Вывести результат</a>
+               href="{% url 'show_result' %}">Вывести результат</a>
         </div>
     </div>
     {% endif %}
