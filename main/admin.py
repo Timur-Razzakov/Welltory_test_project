@@ -23,15 +23,15 @@ class CorrelationAdmin(admin.ModelAdmin):
 
 
 class First_parameterAdmin(admin.ModelAdmin):
-    list_display = ('x_value', 'date_for_the_first', 'created_at')
+    list_display = ('id', 'x_value', 'date_for_the_first', 'created_at')
 
 
 class Second_parameterAdmin(admin.ModelAdmin):
-    list_display = ('y_value', 'date_for_the_second', 'created_at')
+    list_display = ('id', 'y_value', 'date_for_the_second', 'created_at')
 
 
 class DataAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'x_data_type', 'y_data_type', 'created_at')
+    list_display = ('user_id', 'y_value', 'x_value', 'x_data_type', 'y_data_type', 'created_at')
 
 
 admin.site.register(Correlation, CorrelationAdmin)

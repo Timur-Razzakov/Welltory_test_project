@@ -2,11 +2,19 @@
 
 {% block title %} Count up {% endblock %}
 {% block content %}
-<form method="GET" action="#">
-    <div class="form-group">
-        {{ form.as_p }}
+<div class="container">
+    <div class="text-center mt-5">
+        <h1>Подсчёт корреляции</h1>
+        <p class="lead">Выберите нужную дату и виды значений и затем нажмите кнопку "Рассчитать".<br>
+            Результат получите в формате JSON</p>
     </div>
-    <button type="submit" class="btn btn-primary">Рассчитать</button>
-</form>
-
+</div>
+<div class="card card-body">
+    <form method="POST" action="{% url 'count_up'%}">{% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary">Рассчитать</button>
+    </form>
+</div>
 {% endblock %}

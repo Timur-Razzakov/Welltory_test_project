@@ -14,7 +14,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('id','email',)
+        fields = ('email',)
 
     def clean_password2(self):
         """Проверяет пароли на совпадение между собой"""
@@ -42,7 +42,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('id', 'email', 'password', 'is_active', 'is_admin')
+        fields = ('email', 'password', 'is_active', 'is_admin')
 
     def clean_password(self):
         # Независимо от того, что предоставил пользователь, вернуть начальное значение.
@@ -56,21 +56,21 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
 
-    list_display = ('id', 'email', 'is_admin',)
+    list_display = ('email', 'is_admin',)
     list_filter = ('is_admin',)
     fieldsets = (
         # Поля для Отображения в админке
-        (None, {'fields': ('id', 'email', 'password')}),
+        (None, {'fields': ('email', 'password')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     """ Поля которые будут использоваться при создании пользователя """
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('id', 'email', 'password1', 'password2'),
+            'fields': ('email', 'password1', 'password2'),
         }),
     )
-    search_fields = ('id', 'email',)
+    search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
 

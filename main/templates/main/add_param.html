@@ -2,6 +2,13 @@
 
 {% block title %} Add {% endblock %}
 {% block content %}
+<div class="container">
+    <div class="text-center mt-4">
+        <h2>Форма для отправки данных</h2>
+        <p class="lead">Пожалуйста заполните данную форму своими данными.<br>
+        Заранее спасибо. Хорошего дня :)</p>
+    </div>
+</div>
 <div class="card card-body">
     <form method="POST" action="{% url 'add_param' %}">{% csrf_token %}
         <div class="form-group">

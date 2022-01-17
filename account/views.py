@@ -2,10 +2,8 @@ import datetime as dt
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
-# from account.forms import UserLoginForm, UserRegistrationForm, ContactForm, UserUpdateForm
-from .forms import UserRegistrationForm ,UserLoginForm
-from main.models import Error
 
+from .forms import UserRegistrationForm, UserLoginForm
 User = get_user_model()
 
 """Функция для авторизации"""
@@ -37,7 +35,8 @@ def logout_view(request):
 def register_view(request):
     form = UserRegistrationForm(request.POST or None)
     if form.is_valid():
-        new_user = form.save(commit=False)  # instans) commit=False-->исп для полного соединения с базой
+        new_user = form.save(
+            commit=False)  # instans) commit=False-->исп для полного соединения с базой
         new_user.set_password(form.cleaned_data['password'])  # ЗАШИФРОВЫВАЕТ пароль
         new_user.save()
         messages.success(request, 'Пользователь добавлен в систему.')

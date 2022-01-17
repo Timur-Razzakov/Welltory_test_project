@@ -1,33 +1,25 @@
 from django import forms
-from django.forms import ModelForm, Textarea
+
 from .models import First_parameter, Second_parameter, Data
 
 
 class Parameters_Form(forms.Form):
-    date_for_the_first = forms.CharField(label='Дата', widget=forms.DateInput(
-        attrs={'class': 'form-control'}))
-
-    first_parameter = forms.ModelChoiceField(
-        queryset=First_parameter.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Первое значение'
+    date = forms.DateField(
+        required=True, widget=forms.DateInput(attrs={
+            'class': 'form-control', 'type': 'date'}),
+        label='Дата'
     )
-
-    second_parameter = forms.ModelChoiceField(
-        queryset=Second_parameter.objects.all(),
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Второе значение'
+    x_data_type = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Вид первого значения'
     )
-
-    class Meta:
-        model = First_parameter
-        fields = '__all__'
+    y_data_type = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Вид второго значение'
+    )
 
 
 class AddDataForm(forms.Form):
-
     x_data_type = forms.CharField(
         required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
         label='Вид первого значения'
@@ -50,3 +42,12 @@ class AddDataForm(forms.Form):
         required=True, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         label='Дата'
     )
+
+    # def clean_second_parameter(self):
+    #     second_parameter = self.cleaned_data['second_parameter'].split(',')
+    #     first_parameter = self.cleaned_data['first_parameter'].split(',')
+    #     first_parameter = [float(item_x) for item_x in first_parameter]
+    #     second_parameter = [float(item_y) for item_y in second_parameter]
+    #     if len(second_parameter) != len(first_parameter):
+    #         raise ValidationError('Значения должны быть одинакового количества')
+    #     return second_parameter
