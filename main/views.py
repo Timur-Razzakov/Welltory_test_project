@@ -11,12 +11,9 @@ from account.models import MyUser
 
 
 # TODO: выводить messages выводить в цвете
-# TODO: Дописать добавление списка в мани ту мани
 # TODO: настроить Селери для расчета  в фоновых процессах
 # TODO: разобраться как из id получить значения из мани ту мани
-# TODO: Засунуть всё это в докер #Done
-# TODO: получить x_value and y_value при подсчёте DONE
-# TODO: Перенести подсчёт корреляции в отдельную функцию #done
+
 # https://docs.djangoproject.com/en/dev/topics/db/examples/many_to_many/
 # https://gist.github.com/sancau/41b11ddb5ffce1d0ae90d1df8948d0b1
 # https://django.fun/tutorials/select_related-i-prefetch_related-v-django/
@@ -35,19 +32,13 @@ def count_view(request):
             x_data_type = data.get('x_data_type')
             y_data_type = data.get('y_data_type')
             date = data.get('date')
-        get_value = Data.objects.filter(
-            created_at=date,
-            x_data_type=x_data_type,
-            y_data_type=y_data_type
-        ).select_related('user_id',
-                         'x_value',
-                         'y_value'
-                         ).values_list('user_id',
-                                       'x_value',
-                                       'y_value',
-                                       'id')
-        if get_value.exists():
-            ic(get_value)
+        get_value = Data.objects.filter(x_data_type=x_data_type,
+                                        y_data_type=y_data_type,
+                                        created_at=date).values_list('user_id','x_value')
+        if get_value is not None:
+            value_list = list(get_value)
+            ic(value_list)
+
 
             # list_value = list(get_value)
             # x_value = []
@@ -72,20 +63,14 @@ def count_view(request):
             #     value=cor,
             #     p_value=p_value
             # ).save()
+            messages.success(request, 'Вычисляем...')
+            # return redirect('show_result')
         else:
-            print('sdafasdfsdafsdafs')
+            messages.error(request, 'Данная форма невалидна')
+            return redirect('count_up')
 
     return render(request, 'main/count_up.html', {'form': form})
 
-
-# Функция для запроса всех данных
-
-# Второй варианты вывода данных
-# def get_all_data(request):
-#     if request.method == "POST":
-#         data = Data.objects.all()
-#         qs_json = serializers.serialize('json', data)
-#     return render(request, 'main/show_data.html', {'dataset': qs_json})
 
 # Функция для вывода всех данных в виде JSON формата
 def show_all_data(request):
@@ -110,7 +95,6 @@ def new_value(request):
     ic(request.method)
     if request.method == 'POST':
         value_form = AddDataForm(request.POST)
-
         if value_form.is_valid():
             data = value_form.cleaned_data
             x_value = data.get('first_parameter').split(',')
@@ -127,41 +111,33 @@ def new_value(request):
             # str-->float
             first_parameter = [float(item_x) for item_x in x_value]
             second_parameter = [float(item_y) for item_y in y_value]
-            ic(second_parameter)
+
             table = Data.objects.filter(x_data_type=x_data_type, y_data_type=y_data_type)
 
-            if len(first_parameter) == len(second_parameter):
-                for first_item, second_item in zip(first_parameter, second_parameter):
-                    first_value = First_parameter(x_value=first_item, date_for_the_first=date).save()
-                    second_value = Second_parameter(y_value=second_item, date_for_the_second=date).save()
-                if table.exists():  # если существует
-                    data_table = table
-                    ic(data_table)
-                else:
-                    Data(
-                        user_id=user,
-                        x_data_type=x_data_type,
-                        y_data_type=y_data_type,
-                        created_at=date,
-                        x_value=first_value,
-                        y_value=second_value
-                    ).save()
-
-                    # for first_item, second_item in zip(first_parameter, second_parameter):
-                    #     first_value = Data.x_value.create(x_value=first_item)
-                    #     second_value = Data.y_value.create(y_value=second_item)
-                    #     First_parameter(date_for_the_first=date).save()
-                    #     Second_parameter(date_for_the_second=date).save()
-                    #     ic(first_value)
-                    #     ic(second_value)
-
-                data_table.x_value = First_parameter.pk
-                data_table.y_value = Second_parameter.pk
-                messages.success(request, 'Данные отправлены')
-                return redirect('show_form')
+            if table.exists():  # если существует
+                data_table = table
             else:
-                messages.warning(request, 'Значения должны быть одинакового количества')
-                return redirect('show_form')
+                data_table = Data.objects.create(
+                    user_id=user,
+                    x_data_type=x_data_type,
+                    y_data_type=y_data_type,
+                    created_at=date
+                )
+                if len(first_parameter) == len(second_parameter):
+                    for first_item, second_item in zip(first_parameter, second_parameter):
+                        first = First_parameter.objects.create(x_value=first_item, date_for_the_first=date)
+                        second = Second_parameter.objects.create(y_value=second_item, date_for_the_second=date)
+                        ic(first)
+                        data_table.x_value.add(first)
+                        data_table.y_value.add(second)
+                    data_table.x_value.set(First_parameter.pk)
+                    data_table.y_value.set(Second_parameter.pk)
+                else:
+                    messages.warning(request, 'Значения должны быть одинакового количества')
+                    return redirect('show_form')
+
+            messages.success(request, 'Данные отправлены')
+            return redirect('show_form')
         else:
             messages.error(request, 'Данная форма невалидна')
             return redirect('show_form')
