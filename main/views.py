@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-import pickle
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from icecream import ic
+from itertools import chain  # для сбора кортежа в один список
+from scipy.stats import pearsonr
 
 from .forms import Parameters_Form, AddDataForm
 from .models import Data, First_parameter, Second_parameter, Correlation
@@ -12,11 +12,7 @@ from account.models import MyUser
 
 # TODO: выводить messages выводить в цвете
 # TODO: настроить Селери для расчета  в фоновых процессах
-# TODO: разобраться как из id получить значения из мани ту мани
 
-# https://docs.djangoproject.com/en/dev/topics/db/examples/many_to_many/
-# https://gist.github.com/sancau/41b11ddb5ffce1d0ae90d1df8948d0b1
-# https://django.fun/tutorials/select_related-i-prefetch_related-v-django/
 
 def home_view(request):
     return render(request, 'main/home.html')
@@ -34,37 +30,29 @@ def count_view(request):
             date = data.get('date')
         get_value = Data.objects.filter(x_data_type=x_data_type,
                                         y_data_type=y_data_type,
-                                        created_at=date).values_list('user_id','x_value')
-        if get_value is not None:
-            value_list = list(get_value)
-            ic(value_list)
+                                        created_at=date).prefetch_related('user_id', 'x_value', 'y_value')
+        if get_value.exists():
+            list_value = list(get_value)
+            # получаем x_val и y_val
+            for item in list_value:
+                user_id = item.user_id
+                x_val = item.x_value.values_list('x_value')
+                y_val = item.y_value.values_list('y_value')
+                # затем собираем кортеж в один список
+                first_value = list(chain.from_iterable(x_val))
+                second_value = list(chain.from_iterable(y_val))
+            # производим вычисление
+            cor, p_value = pearsonr(first_value, second_value)
 
-
-            # list_value = list(get_value)
-            # x_value = []
-            # y_value = set()
-            # for dicts in list_value:
-            #     for key, value in dicts.items():
-            #         if key == 'user_id':
-            #             user_id = value
-            #         elif key == 'x_value':
-            #             x_value.append(value)
-            #         else:
-            #             y_value.add(value)
-            #             break
-            # ic(user_id)
-            # ic(len(x_value))
-            # ic(len(y_value))
-            # cor, p_value = pearsonr(first_parameter, second_parameter)
-            # Correlation(
-            #     user_id=user,
-            #     x_data_type=x_data_type,
-            #     y_data_type=y_data_type,
-            #     value=cor,
-            #     p_value=p_value
-            # ).save()
+            Correlation(
+                user_id=user_id,
+                x_data_type=x_data_type,
+                y_data_type=y_data_type,
+                value=cor,
+                p_value=p_value
+            ).save()
             messages.success(request, 'Вычисляем...')
-            # return redirect('show_result')
+            return redirect('show_result')
         else:
             messages.error(request, 'Данная форма невалидна')
             return redirect('count_up')
@@ -74,7 +62,8 @@ def count_view(request):
 
 # Функция для вывода всех данных в виде JSON формата
 def show_all_data(request):
-    data = list(Data.objects.values())
+    data = list(Data.objects.prefetch_related('x_value', 'y_value').values())
+
     return JsonResponse(data, safe=False)
 
 
@@ -84,15 +73,9 @@ def show_all_results(request):
     return JsonResponse(data, safe=False)
 
 
-# Функция для вывода формы, которая служит для заполнения данными
-def show_form(request):
-    form = AddDataForm()
-    return render(request, 'main/add_param.html', {'form': form})
-
-
 # Функция для добавления новых значений для корреляции
 def new_value(request):
-    ic(request.method)
+    form = AddDataForm()
     if request.method == 'POST':
         value_form = AddDataForm(request.POST)
         if value_form.is_valid():
@@ -127,20 +110,17 @@ def new_value(request):
                     for first_item, second_item in zip(first_parameter, second_parameter):
                         first = First_parameter.objects.create(x_value=first_item, date_for_the_first=date)
                         second = Second_parameter.objects.create(y_value=second_item, date_for_the_second=date)
-                        ic(first)
                         data_table.x_value.add(first)
                         data_table.y_value.add(second)
                     data_table.x_value.set(First_parameter.pk)
                     data_table.y_value.set(Second_parameter.pk)
                 else:
                     messages.warning(request, 'Значения должны быть одинакового количества')
-                    return redirect('show_form')
+                    return redirect('add_param')
 
             messages.success(request, 'Данные отправлены')
-            return redirect('show_form')
+            return redirect('add_param')
         else:
             messages.error(request, 'Данная форма невалидна')
-            return redirect('show_form')
-    messages.error(request, 'Ошибка в методе запроса')
-    # return render(request, 'main/add_param.html', {'form': form})
-    return redirect('show_form')
+            return redirect('add_param')
+    return render(request, 'main/add_param.html', {'form': form})
