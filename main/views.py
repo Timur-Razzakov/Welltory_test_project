@@ -3,7 +3,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from itertools import chain  # для сбора кортежа в один список
-from scipy.stats import pearsonr
+
+from icecream import ic
+
+from .tasks import correlation_calculation
 
 from .forms import Parameters_Form, AddDataForm
 from .models import Data, First_parameter, Second_parameter, Correlation
@@ -11,7 +14,6 @@ from account.models import MyUser
 
 
 # TODO: выводить messages выводить в цвете
-# TODO: настроить Селери для расчета  в фоновых процессах
 
 
 def home_view(request):
@@ -20,6 +22,7 @@ def home_view(request):
 
 # Функция для подсчёта
 def count_view(request):
+    global user_id, second_value, first_value
     form = Parameters_Form()
     if request.method == 'POST':
         value_form = Parameters_Form(request.POST)
@@ -30,7 +33,7 @@ def count_view(request):
             date = data.get('date')
         get_value = Data.objects.filter(x_data_type=x_data_type,
                                         y_data_type=y_data_type,
-                                        created_at=date).prefetch_related('user_id', 'x_value', 'y_value')
+                                        created_at=date).prefetch_related('x_value', 'y_value')
         if get_value.exists():
             list_value = list(get_value)
             # получаем x_val и y_val
@@ -41,18 +44,16 @@ def count_view(request):
                 # затем собираем кортеж в один список
                 first_value = list(chain.from_iterable(x_val))
                 second_value = list(chain.from_iterable(y_val))
-            # производим вычисление
-            cor, p_value = pearsonr(first_value, second_value)
+            # производим вычисление delay--говорит, о том что это таск и не ждёт
+            correlation_calculation.delay(
+                first_value,
+                second_value,
+                x_data_type,
+                y_data_type, )
+            messages.success(request, 'Вычисляем...\n'
+                                      '(Результат можете посмотреть в разделе\n'
+                                      '"Вывести результат")')
 
-            Correlation(
-                user_id=user_id,
-                x_data_type=x_data_type,
-                y_data_type=y_data_type,
-                value=cor,
-                p_value=p_value
-            ).save()
-            messages.success(request, 'Вычисляем...')
-            return redirect('show_result')
         else:
             messages.error(request, 'Данная форма невалидна')
             return redirect('count_up')

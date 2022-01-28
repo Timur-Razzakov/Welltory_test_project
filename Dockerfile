@@ -1,25 +1,19 @@
 FROM python:3.8
-RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# create work dir
-RUN mkdir /app
 # Define work dir
 WORKDIR /app
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
 
 # Copy reqs
-COPY ./requirements.txt .
+COPY ./requirements.txt requirements.txt
 # Install reqs
-RUN pip install --upgrade pip
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-
-# Copy all stuff
-COPY .. /app
+COPY . /app
+# add all stuff
 
 
 
