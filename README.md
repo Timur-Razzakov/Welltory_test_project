@@ -3,7 +3,6 @@
 
 ### Стек технологий
 - Django
-- Selenium
 - Celery
 - PostgreSQL
 - Docker
